@@ -29,14 +29,16 @@ async def handle_send_message(p, penguin_id: int, message: str):
         consequence = next((c for w, c in p.server.chat_filter_words.items() if w in tokens), None)
 
         if consequence is not None:
-            if consequence.filter:
-                await p.room.send_xt('mm', message, p.id, f=lambda px: px.moderator)
-                return
             if consequence.ban:
+                await p.room.send_xt('mm', message, p.id, f=lambda px: px.moderator)
                 await moderator_ban(p, p.id, comment='Inappropriate language', message=message)
                 return
             elif consequence.warn:
+                await p.room.send_xt('mm', message, p.id, f=lambda px: px.moderator)
                 await moderator_kick(p, p.id)
+                return
+            elif consequence.filter:
+                await p.room.send_xt('mm', message, p.id, f=lambda px: px.moderator)
                 return
 
     try:
